@@ -2,10 +2,8 @@ package main
 
 import (
 	"brainfuck/brainfuck"
-	"brainfuck/brainfuck/bfruntime"
 	"fmt"
 	"io/ioutil"
-	"os"
 )
 
 func main() {
@@ -17,10 +15,11 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("error lexing file: %v", err))
 	}
-	m := bfruntime.NewGoMachine(os.Stdin, os.Stdout)
+	//m := bfruntime.NewGoMachine(os.Stdin, os.Stdout)
 	nodes := brainfuck.Lex(tokens)
 	program := brainfuck.Compile(nodes)
+	fmt.Println(brainfuck.TransformToGo(program))
 	//newProgram := brainfuck.Optimize(program)
 	//newProgram.Run(m)
-	program.Run(m)
+	//program.Run(m)
 }
