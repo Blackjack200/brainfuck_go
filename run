@@ -1,0 +1,2 @@
+#!/bin/bash
+go run main.go && go build -o out test_opt.go && rm test_opt.go &&  ./out && rm out

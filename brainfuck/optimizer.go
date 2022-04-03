@@ -8,34 +8,59 @@ var optimizeToken = []byte{
 }
 
 func transformOptimize(old Program) Program {
-	//TODO more optimization
+	return optimizeO2(old)
+}
+
+func optimizeO2(old Program) Program {
 	var newProgram []Opcode
 	num := uint64(0)
 	curtToken := Token(TokenProgramStart)
 
-	for pos, max := 0, len(old); pos < max; pos++ {
-		cur := old[pos]
-		mergeToken := func() {
-			if num > 0 {
-				//jmp not set
-				newProgram = append(newProgram, Opcode{Token: curtToken, Num: num})
-			}
-			curtToken = Token(TokenProgramStart)
+	mergeToken := func() {
+		if num > 0 {
+			//jmp not set
+			newProgram = append(newProgram, Opcode{Token: curtToken, Num: num})
 		}
-		if !inArray(optimizeToken, byte(cur.Token)) {
+		curtToken = Token(TokenProgramStart)
+		num = 0
+	}
+
+	tokenType := map[Token]int{
+		TokenAdd:       0,
+		TokenDec:       0,
+		TokenMoveRight: 1,
+		TokenMoveLeft:  1,
+	}
+
+	for i, curt := range old {
+		_ = old[i]
+		if !inArray(optimizeToken, byte(curt.Token)) {
 			mergeToken()
-			num = 0
-			newProgram = append(newProgram, cur)
+			newProgram = append(newProgram, curt)
 			continue
 		}
-		if cur.Token == curtToken {
-			num++
+		if tokenType[curt.Token] == tokenType[curtToken] {
+			if curt.Token != curtToken {
+				if curt.Num > num {
+					num = curt.Num - num
+					curtToken = curt.Token
+				} else {
+					num -= curt.Num
+				}
+			} else {
+				num += curt.Num
+			}
 		} else {
 			mergeToken()
-			curtToken = cur.Token
-			num = 1
+			curtToken = curt.Token
+			num = curt.Num
 		}
 	}
-	newProgram = append(newProgram, Opcode{Token: curtToken, Num: num})
+	mergeToken()
 	return newProgram
+}
+
+func fixIndex(old Program) Program {
+	//TODO
+	return nil
 }
