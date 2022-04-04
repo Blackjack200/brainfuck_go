@@ -7,11 +7,7 @@ var optimizeToken = []byte{
 	TokenMoveLeft,
 }
 
-func transformOptimize(old Program) Program {
-	return optimizeO2(old)
-}
-
-func optimizeO2(old Program) Program {
+func Optimize(old Program) Program {
 	var newProgram []Opcode
 	num := uint64(0)
 	curtToken := Token(TokenProgramStart)
@@ -57,10 +53,34 @@ func optimizeO2(old Program) Program {
 		}
 	}
 	mergeToken()
-	return newProgram
+	return fixIndex(newProgram)
 }
 
 func fixIndex(old Program) Program {
-	//TODO
-	return nil
+	var newProgram []Opcode
+	var stack []int
+	max := len(old)
+	for i := 0; i < max; i++ {
+		cur := old[i]
+		if cur.Token == TokenStartLoop {
+			stack = append(stack, len(newProgram))
+			newProgram = append(newProgram, Opcode{
+				Token: TokenStartLoop,
+				Jmp:   i,
+				Num:   cur.Num,
+			})
+		} else if cur.Token == TokenEndLoop {
+			jmp := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+			newProgram[jmp].Jmp = i
+			newProgram = append(newProgram, Opcode{
+				Token: TokenEndLoop,
+				Jmp:   jmp,
+				Num:   cur.Num,
+			})
+		} else {
+			newProgram = append(newProgram, cur)
+		}
+	}
+	return newProgram
 }

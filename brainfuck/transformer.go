@@ -8,7 +8,7 @@ func TransformToGo(p Program) string {
 		f.Func().Id("main").Params().BlockFunc(func(g *jen.Group) {})
 		return f.GoString()
 	}
-	p = transformOptimize(p)
+	p = Optimize(p)
 	code := func() []Token {
 		buf := make([]Token, len(p))
 		for _, pp := range p {
