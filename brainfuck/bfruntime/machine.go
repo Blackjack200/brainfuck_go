@@ -41,9 +41,9 @@ func (g *GoMachine) Out(b byte) {
 	_, _ = fmt.Fprintf(g.out, "%c", b)
 }
 
-func NewGoMachine(in io.Reader, out io.Writer) *GoMachine {
+func NewGoMachine(tape Tape, in io.Reader, out io.Writer) *GoMachine {
 	return &GoMachine{
-		tape: NewMemoryTape(),
+		tape: tape,
 		in:   in,
 		out:  out,
 	}
